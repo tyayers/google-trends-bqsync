@@ -15,6 +15,13 @@ resource "google_app_engine_application" "app" {
 }
 
 resource "google_service_account" "service_account" {
+  project     = var.project_id
   account_id   = "trendservice"
   display_name = "Trend Service Account"
+}
+
+resource "google_project_iam_member" "firestore_owner_binding" {
+  project = var.project_id
+  role    = "roles/datastore.owner"
+  member  = "serviceAccount:${google_service_account.service_account.email}"
 }
