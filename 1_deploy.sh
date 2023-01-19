@@ -1,1 +1,0 @@
-terraform apply -var "project_id=cloud32x" -var "region=europe-west"

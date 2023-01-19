@@ -7,15 +7,52 @@ from datetime import datetime, timedelta
 from google.cloud import storage, bigquery
 from pytrends.request import TrendReq
 
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+import google.auth
+
 urls = (
+    '/trends/(.*)', 'terms_manager',
     '/initial(.*)', 'data_initial_load',
     '/latest(.*)', 'data_latest',
-    '/growth_rates(.*)', 'data_growth',
-    '/trends/initial(.*)', 'trends_initial_load',
-    '/trends/latest(.*)', 'trends_latest'
+    '/growth_rates(.*)', 'data_growth'
 )
 app = web.application(urls, globals())
 
+if not firebase_admin._apps:
+  cred = credentials.ApplicationDefault()
+  firebase_admin.initialize_app(cred, {
+    'projectId': cred.project_id,
+  })
+
+class terms_manager:
+    db = firestore.client()
+
+    def GET(self, topic):
+
+        new_result = {}
+
+        doc_ref = self.db.collection('trends').document(topic)
+        doc = doc_ref.get().to_dict()
+        
+        print(doc)
+
+        new_result = {
+            "terms": []
+        }
+
+        if doc:
+            for term in doc["terms"]:
+                new_result["terms"].append(term)
+
+        web.header('Access-Control-Allow-Origin', '*')
+        if new_result:
+            web.header('Content-Type', 'application/json')
+            return json.dumps(new_result)
+        else:
+            return web.notfound("Not found")        
+        
 class data_growth:
     def GET(self, site):
         bucketName = os.getenv('BUCKET_NAME')
