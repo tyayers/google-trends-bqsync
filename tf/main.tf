@@ -70,6 +70,8 @@ resource "google_artifact_registry_repository" "trends-registry" {
   provisioner "local-exec" {
     command = "cd .. && gcloud builds submit --project=${var.project_id} --config=cloudbuild.yaml --substitutions=_LOCATION='${var.region}',_REPOSITORY='trends-registry',_IMAGE='trends-service' ."
   }
+
+  depends_on = [google_project_service.enable_cloudrun]
 }
 
 resource "google_cloud_run_service" "trends_admin_service" {
@@ -90,7 +92,7 @@ resource "google_cloud_run_service" "trends_admin_service" {
     latest_revision = true
   }
 
-  depends_on = [google_project_service.enable_cloudrun]
+  depends_on = [google_project_service.enable_artifactregistry]
 }
 
 resource "google_cloud_scheduler_job" "trends-refresh" {
