@@ -1,4 +1,6 @@
-trends_output.json
+.terraform/
+.terraform.lock.hcl
+/tf/terraform.tfstate
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
