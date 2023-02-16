@@ -22,6 +22,11 @@ resource "google_project_service" "enable_artifactregistry" {
   service = "artifactregistry.googleapis.com"
 }
 
+resource "google_project_service" "enable_cloudbuild" {
+  project = var.project_id
+  service = "cloudbuild.googleapis.com"
+}
+
 resource "google_project_service" "enable_scheduler" {
   project = var.project_id
   service = "cloudscheduler.googleapis.com"
