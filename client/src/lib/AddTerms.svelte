@@ -1,8 +1,12 @@
 <script lang="ts">
 
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
 
-  export let terms: string = ""
+  import type {TrendsTerm, TableColumn} from '$lib/Types'
+   
+  export let terms: TrendsTerm[] = []
+  
+  let termsText: string = ""
 
   const dispatch = createEventDispatcher();
   
@@ -11,16 +15,40 @@
   }
 
   const save = () => {
+    let newTermsText: string[] = termsText.split("\n")
+    let newTerms: TrendsTerm[] = []
+    
+    for (const newTerm of newTermsText) {
+      let existingTerm = terms.find( term => term['name'] === newTerm );
+      
+      if (!existingTerm) {
+        existingTerm = {
+          name: newTerm
+        }
+      }
+      
+      newTerms.push(existingTerm)
+    }
+    
     dispatch('save', {
-      terms: terms
+      terms: newTerms
     });
   }
+  
+  onMount(async function () {
+    for (const term of terms){
+      if (termsText == "")
+        termsText = term.name
+      else
+        termsText += "\n" + term.name
+    }
+  });
 </script>
 
 <div class="sc" on:keydown={() => {}} on:click={cancel}>
   <div class="sp" on:keydown={() => {}} on:click|stopPropagation={() => {}}>
-    <h2>Edit search</h2>
-    <textarea bind:value={terms}></textarea>
+    <h2>Edit trend terms</h2>
+    <textarea bind:value={termsText}></textarea>
     <button class="sob" on:click={save}>Save</button>
   </div>
 

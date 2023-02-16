@@ -13,6 +13,8 @@ from firebase_admin import firestore
 import google.auth
 
 urls = (
+    '/trends/(.*)/refresh', 'refresh_manager',
+    '/trends/(.*)/initial', 'initial_manager',
     '/trends/(.*)', 'terms_manager',
     '/initial(.*)', 'data_initial_load',
     '/latest(.*)', 'data_latest',
@@ -26,6 +28,96 @@ if not firebase_admin._apps:
     'projectId': cred.project_id,
   })
 
+class refresh_manager:
+    db = firestore.client()
+    bq = client = bigquery.Client()
+    
+    def POST(self, topic):
+        # Start refresh...
+        doc_ref = self.db.collection('trends').document(topic)
+        doc = doc_ref.get().to_dict()
+        
+        print("starting refresh")
+
+        get_trends_latest(doc["terms"], doc["geos"], topic)
+        
+        print("finished refresh")
+        self.db.collection('trends').document(topic).set(doc)
+        
+        web.header('Access-Control-Allow-Origin', '*')
+        web.header('Content-Type', 'application/json')
+        return json.dumps(doc)
+    
+    def insertToBigQuery(self, terms):
+        rows_to_insert = []
+
+        for term in terms:
+            for rec in term["data"]:
+                rows_to_insert.append(rec)
+
+        errors = self.bq.insert_rows_json(os.environ.get('TRENDS_TABLE'), rows_to_insert)
+        if errors == []:
+            print("New rows have been added.")
+        else:
+            print("Encountered errors while inserting rows: {}".format(errors))
+        
+class initial_manager:
+    db = firestore.client()
+    bq = client = bigquery.Client()
+    
+    def POST(self, topic):
+        data = None
+        if web.data():
+            data = json.loads(web.data())
+
+        terms = []
+        geos = []
+
+        if data:
+            print("found data in post body")
+            terms = data["terms"]
+            geos = data["geos"]
+        else:
+            # Start refresh...
+            doc_ref = self.db.collection('trends').document(topic)
+            doc = doc_ref.get().to_dict()
+            terms = doc["terms"]
+            geos = doc["geos"]
+        
+        print("starting initial")
+
+        get_trends_all(terms, geos)
+        
+        print("finished initial, writing output file")
+        f = open("trends_output.json", "w")
+        f.write(json.dumps(terms))
+        f.close()        
+        
+        self.insertToBigQuery(terms)
+
+        web.header('Access-Control-Allow-Origin', '*')
+        web.header('Content-Type', 'application/json')
+        return json.dumps({
+            "result": "Ok"
+        })
+    
+    def insertToBigQuery(self, terms):
+        
+        for term in terms:
+            rows_to_insert = []
+
+            for rec in term["data"]:
+                rows_to_insert.append(rec)
+
+            if len(rows_to_insert) > 0:
+                errors = self.bq.insert_rows_json(os.environ.get('TRENDS_TABLE'), rows_to_insert)
+                if errors == []:
+                    print("Added rows to " + os.environ.get('TRENDS_TABLE') + " for term " + term["name"])
+                else:
+                    print("Encountered errors while inserting rows: {}".format(errors))
+            else:
+                print("No rows to add for term " + term["name"])
+
 class terms_manager:
     db = firestore.client()
 
@@ -38,272 +130,73 @@ class terms_manager:
         
         print(doc)
 
-        new_result = {
-            "terms": []
-        }
-
-        if doc:
-            for term in doc["terms"]:
-                new_result["terms"].append(term)
-
-        web.header('Access-Control-Allow-Origin', '*')
-        if new_result:
-            web.header('Content-Type', 'application/json')
-            return json.dumps(new_result)
-        else:
-            return web.notfound("Not found")        
-        
-class data_growth:
-    def GET(self, site):
-        bucketName = os.getenv('BUCKET_NAME')
-        table = os.getenv('TABLE_NAME')
-        
-        storage_client = storage.Client()
-        bucket = storage_client.bucket(bucketName)
-        
-        result = self.load(bucket, table)
-        
-        web.header('Access-Control-Allow-Origin', '*')
-        web.header('Content-Type', 'application/json')
-        
-        return json.dumps({"result": "Success"})
-
-    def load(self, bucket, table):
-        client = bigquery.Client()
-        query = "SELECT * FROM `" + table + "` LIMIT 1000"
-        
-        query_job = client.query(query)  # Make an API request.
-
-        result = []
-        for row in query_job:
-            # Row values can be accessed by field name or index.
-            result.append({
-                "name": row["name"],
-                "date": str(row["date"]),
-                "growth_rate": row["agg_growth"],
-                "trends_growth": row["trends_growth"],
-                "news_growth": row["news_growth"]
-            })
-
-        d = bucket.blob("output/growth_rates.json")
-        d.upload_from_string(json.dumps(result))
-        
-        return result
-        
-class data_latest:
-    def GET(self, site):
-        bucketName = os.getenv('BUCKET_NAME')
-        topic_singular = web.input().topic_singular
-        topic_plural = web.input().topic_plural
-        
-        storage_client = storage.Client()
-        bucket = storage_client.bucket(bucketName)
-        
-        terms = get_terms(bucket, "terms")
-        result = get_news_volume_latest(terms["terms"], topic_singular)
-
-        d = bucket.blob("input/news_volume_update.csv")
-        d.upload_from_string(result)
-
-        web.header('Access-Control-Allow-Origin', '*')
-        web.header('Content-Type', 'application/json')
-        return json.dumps({"result": "Success"})
-
-        # web.header('Content-Type', 'text/csv')
-        # return result
-
-class data_initial_load:
-    def GET(self):
-        bucketName = os.getenv('BUCKET_NAME')
-        topic_singular = web.input().topic_singular
-        topic_plural = web.input().topic_plural
-
-        storage_client = storage.Client()
-        bucket = storage_client.bucket(bucketName)
-        
-        result = self.load(bucket, topic_singular, topic_plural)
-
-        web.header('Access-Control-Allow-Origin', '*')
-        web.header('Content-Type', 'application/json')
-        return json.dumps({"result": "Success"})
-
-        # web.header('Content-Type', 'text/csv')
-        # return result
-        
-    def load(self, bucket, topic_singular, topic_plural): 
-        terms = get_terms(bucket, "terms")
-        result = get_news_volume(terms["terms"], topic_singular)
-        
-        d = bucket.blob("input/news_volume_initial.csv")
-        d.upload_from_string(result)
-        
-        return result
-
-class trends_initial_load:
-    def GET(self, site):
-        bucketName = os.getenv('BUCKET_NAME')
-        topic_singular = web.input().topic_singular
-        topic_plural = web.input().topic_plural
-        
-        storage_client = storage.Client()
-        bucket = storage_client.bucket(bucketName)
-        
-        result = self.load(bucket, topic_singular, topic_plural)
-
-        web.header('Access-Control-Allow-Origin', '*')
-        web.header('Content-Type', 'application/json')
-        return json.dumps({"result": "Success"})
-
-    def load(self, bucket, topic_singular, topic_plural):
-        terms = get_terms(bucket, "terms")
-
-        result = get_trends_initial(terms["terms"], terms["geos"], topic_singular)
-
-        d = bucket.blob("input/trend_scores_initial.csv")
-        d.upload_from_string(result)
-
-        return result
-
-class trends_latest:
-    def GET(self, site):
-        bucketName = os.getenv('BUCKET_NAME')
-        print(bucketName)
-        topic_singular = web.input().topic_singular
-        topic_plural = web.input().topic_plural
-        
-        storage_client = storage.Client()
-        bucket = storage_client.bucket(bucketName)
-        
-        terms = get_terms(bucket, "terms")
-        result = get_trends_latest(terms["terms"], terms["geos"], topic_singular)
-
-        print("Writing trend updates to disk...")
-        f = open("trend_scores_update.csv", "w")
-        f.write(result)
-        f.close()
-
-        print("Writing trend updates to cloud storage...")
-        d = bucket.blob("input/trend_scores_update.csv")
-        d.upload_from_string(result)
-
-        web.header('Access-Control-Allow-Origin', '*')
-        web.header('Content-Type', 'application/json')
-        return json.dumps({"result": "Success"})
-
-def get_terms(bucket, key):
-    terms = []
-    geos = ["WORLD"]
-
-    blob = bucket.blob("output/topic_entities.json")
-    data = json.loads(blob.download_as_string())
-
-    for term in data[key]:
-        name = term["Name"]
-        name = name.replace("-", " ")
-        name_pieces = name.split(" ")
-        name = ""
-        for name_piece in name_pieces:
-            if len(name_piece) > 2:
-              name = name + " " + name_piece.replace(",", "")
+        if "geos" not in doc:
+            doc["geos"] = []
             
-        # name = name.replace(", ", " ").replace(" or ", "").replace(" in 
-        terms.append(name)
+        if "terms" not in doc:
+            doc["terms"] = []
 
-    if "geos" in data:
-        geos = data["geos"]
+        web.header('Access-Control-Allow-Origin', '*')
+        if doc:
+            web.header('Content-Type', 'application/json')
+            return json.dumps(doc)
+        else:
+            return web.notfound("Not found")
 
-    print(terms)
+    def POST(self, topic):
 
-    return {
-      "geos": geos,
-      "terms": terms
-    }
-
-def get_news_volume(terms, topic_singular):
-    result = ""
-    for term in terms:
-        query = ""
-        queryWords = term.split(" ")
-        for word in queryWords:
-            tempWord = word.lower().replace(",", "").replace(".", "").replace(
-                " or ", "").replace(" and ", "").replace("-", " ").replace("(", "").replace(")", "").replace("aka", "")
-
-            if len(tempWord) > 2:
-                tempWord = tempWord.replace(" ", "%20")
-                if (query == ""):
-                    query = tempWord
-                else:
-                    query = query + "%20" + tempWord
-
-        print('Searching GDELT for ', query)
-
-        url = 'https://api.gdeltproject.org/api/v2/doc/doc?query=' + \
-            query + \
-            '%20' + topic_singular + '&mode=timelinevolraw&format=json'
-        vol = requests.get(url)
-
-        volData = vol.json()
-        if "timeline" in volData:
+        data = json.loads(web.data())
         
-            print('Found ', len(volData["timeline"][0]["data"]), ' records')
-            for day in volData["timeline"][0]["data"]:
-                if result != "":
-                    result = result + "\n"
-
-                result = result + term.replace(",", "") + "," + day["date"] + "," + \
-                    str(day["value"]) + "," + str(day["norm"])
-
-        time.sleep(.3)
-
-    return result
-
-def get_news_volume_latest(terms, topic_singular):
-    result = ""
-    yesterday_string = datetime.strftime(
-        datetime.now() - timedelta(1), '%Y%m%d') + "T000000Z"
-    for term in terms:
-        query = ""
-        queryWords = term.split(" ")
-        for word in queryWords:
-            tempWord = word.lower().replace(",", "").replace(".", "").replace(
-                " or ", "").replace(" and ", "").replace("-", " ").replace("(", "").replace(")", "").replace("aka", "")
-
-            if len(tempWord) > 2:
-                tempWord = tempWord.replace(" ", "%20")
-                
-                if (query == ""):
-                    query = tempWord
-                else:
-                    query = query + "%20" + tempWord
-
-        url = 'https://api.gdeltproject.org/api/v2/doc/doc?query=' + \
-            query + \
-            '%20' + topic_singular + '&mode=timelinevolraw&format=json&TIMESPAN=1w'
-        vol = requests.get(url)
-
-        volData = vol.json()
-        if "timeline" in volData and len(volData["timeline"]) > 0:
-            for day in volData["timeline"][0]["data"]:
-
-                # Only get yesterday's value...
-                if str(day["date"]) == yesterday_string:
-                    if result != "":
-                        result = result + "\n"
-
-                    result = result + term.replace(",", "") + "," + day["date"] + "," + \
-                        str(day["value"]) + "," + str(day["norm"])
-
-        time.sleep(.2)
-
-    return result
-
-def get_trends_initial(terms, geos, topic_singular):
+        doc_ref = self.db.collection('trends').document(topic)
+        doc = doc_ref.get().to_dict()
+        
+        doc["terms"] = data["terms"]
+        self.db.collection('trends').document(topic).set(doc)
+        
+        web.header('Access-Control-Allow-Origin', '*')
+        web.header('Content-Type', 'application/json')
+        return json.dumps({"result": "OK"})
+        
+def get_trends_latest(terms, geos, topic_singular):
     result = ""
     pytrends = TrendReq(hl='en-US', tz=60, retries=8, timeout=(10,25), backoff_factor=0.8)
 
     for term in terms:
-        kw_list = [term + " " + topic_singular]
+        kw_list = [term["name"]]
+        term["data"] = []
+        
+        for geo in geos:
+            new_geo = ""
+            if geo != "WORLD":
+                new_geo = geo
 
+            pytrends.build_payload(kw_list, cat=0, timeframe='now 7-d', geo=new_geo, gprop='')
+            df = pytrends.interest_over_time()
+
+            row = {}
+            for row in df.itertuples():
+                row = {
+                    "geo": geo,                    
+                    "name": term["name"],
+                    "date": str(row.Index.date()),                    
+                    "score": row[1]
+                }
+        
+            print(row)
+                        
+            if row != {}:
+                term["data"].append(row)
+
+    return result
+
+def get_trends_all(terms, geos):
+    result = ""
+    pytrends = TrendReq(hl='en-US', tz=60, retries=8, timeout=(10,25), backoff_factor=0.8)
+
+    for term in terms:
+        kw_list = [term["name"]]
+        term["data"] = []
+        
         for geo in geos:
             new_geo = ""
             if geo != "WORLD":
@@ -312,39 +205,21 @@ def get_trends_initial(terms, geos, topic_singular):
             pytrends.build_payload(kw_list, cat=0, timeframe='today 5-y', geo=new_geo, gprop='')
             df = pytrends.interest_over_time()
 
+            row = {}
             for row in df.itertuples():
-                if result != "":
-                    result = result + "\n"
 
-                new_line = geo + "," + term.replace(",", "") + "," + str(row.Index.date()) + "," + str(row[1])
-                result = result + new_line
-                print(new_line)
+                print("adding row " + geo + " " + term["name"] + " " + str(row.Index.date()))
+
+                row = {
+                    "geo": geo,                    
+                    "name": term["name"],
+                    "date": str(row.Index.date()),                    
+                    "score": row[1]
+                }
+
+                term["data"].append(row)
 
     return result
 
-def get_trends_latest(terms, geos, topic_singular):
-    result = ""
-    pytrends = TrendReq(hl='en-US', tz=60, retries=8, timeout=(10,25), backoff_factor=0.8)
-
-    for term in terms:
-        kw_list = [term + " " + topic_singular]
-
-        for geo in geos:
-            new_geo = ""
-            if geo != "WORLD":
-                new_geo = geo
-
-            pytrends.build_payload(kw_list, cat=0, timeframe='today 1-m', geo=new_geo, gprop='')
-            df = pytrends.interest_over_time()
-
-            for row in df.itertuples():
-                if result != "":
-                    result = result + "\n"
-
-                new_line = geo + "," + term.replace(",", "") + "," + str(row.Index.date()) + "," + str(row[1])
-                result = result + new_line
-                print(new_line)
-
-    return result
 if __name__ == "__main__":
     app.run()

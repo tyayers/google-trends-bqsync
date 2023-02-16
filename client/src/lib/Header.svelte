@@ -4,13 +4,15 @@
 
 
     import { createEventDispatcher } from 'svelte';
-
     const dispatch = createEventDispatcher();
 
     function showEditDialog() {
       dispatch('showEditDialog', {});
     }
-  
+    
+    function refresh() {
+      dispatch('refresh', {});
+    }
    
   </script>
   
@@ -27,6 +29,7 @@
       </div>
     </div>
     <div class="hr">
+      <button class="sob" on:click={refresh}>Refresh</button>
       <button class="sob" on:click={showEditDialog}>Edit</button>
     </div>
   </div>
@@ -58,8 +61,6 @@
   
     .hr {
       display: flex;
-      position: relative;
-      right: 40px;
     }
   
     .hi {
@@ -135,5 +136,6 @@
       font-size: 14px;
       font-weight: 400;
       min-width: 89px;
+      margin-right: 3px;
     }
     </style>

@@ -1,71 +1,44 @@
 <script lang="ts">
-  import type {TrendsTerm} from '$lib/Types'
+  import type {TrendsTerm, TableColumn} from '$lib/Types'
+  // import { each } from 'svelte/internal';
 
   // export let termData: TrendsTerm;
-
-
+  export let columns: TableColumn[] = [];
+  export let data: TrendsTerm[] = [];
+  
 </script>
 
 <table class="t">
   <thead>
       <tr>
-          <th>Name</th>
-          <th>Points</th>
+          {#each columns as col}
+            <th>{col.Header}</th>
+          {/each}
       </tr>
   </thead>
   <tbody>
-      <tr>
-          <td>Dom</td>
-          <td>6000</td>
-      </tr>
-      <tr class="active-row">
-          <td>Melissa</td>
-          <td>5150</td>
-      </tr>
-
-      <!-- and so on... -->
+      {#each data as row}
+        <tr>
+          {#each columns as col}
+            {#if row[col["accessor"]] != undefined}
+              <td>{row[col["accessor"]]}</td>
+            {:else}
+              <td></td>
+            {/if}
+          {/each}
+        </tr>      
+      {/each}
   </tbody>
 </table>
 
-
-<!-- <div class="c">
-  <div class="tn" contenteditable=true>{termData.name}</div>
-  <div class="ts">{termData.score}</div>
-  <div class="tu">{termData.lasteUpdate}</div>
-</div> -->
-
 <style>
-  .c {
-    display: flex;
-    height: 50px;
-    border-bottom: solid 1px rgba(242, 242, 242, 1);
-    vertical-align: center;
-    padding-top: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
-    /* padding-bottom: 10px; */
-  }
-
-  .tn {
-    display: flex;
-    flex: 1 0 auto;
-  }
-
-  .ts {
-    display: flex;
-    flex: 1 0 auto;
-  }
-
-  .tu {
-    display: flex;
-    position: relative;
-    right: 10px;
-  }
 
   .t {
     border-collapse: collapse;
     margin: 0;
-    width: 100%;
+    width: 95vw;
+    margin: 20px;
+    border-radius: 25px;
     font-size: 0.9em;
     font-family: sans-serif;
 
@@ -73,8 +46,9 @@
   }
 
   .t thead {
-    box-sDizing: border-box;
+    box-sizing: border-box;
     background-color: rgb(248 248 248);
+    border-radius: 10% 10% 0% 0%;
   }
 
   .t thead tr {
@@ -90,6 +64,7 @@
     text-transform: uppercase;
     padding-top: 8px;
     padding-bottom: 8px;
+    
   }
 
   .t tbody tr {
