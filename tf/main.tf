@@ -15,7 +15,69 @@ variable "region" {
   type        = string
 }
 
+variable "billing_account" {
+  description = "Billing account id."
+  type        = string
+  default     = null
+}
+
+variable "project_parent" {
+  description = "Parent folder or organization in 'folders/folder_id' or 'organizations/org_id' format."
+  type        = string
+  default     = null
+  validation {
+    condition     = var.project_parent == null || can(regex("(organizations|folders)/[0-9]+", var.project_parent))
+    error_message = "Parent must be of the form folders/folder_id or organizations/organization_id."
+  }
+}
+
+variable "project_create" {
+  description = "Create project. When set to false, uses a data source to reference existing project."
+  type        = bool
+  default     = false
+}
+
 # Resources
+
+# Project
+module "project" {
+  source          = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/project?ref=v15.0.0"
+  name            = var.project_id
+  parent          = var.project_parent
+  billing_account = var.billing_account
+  project_create  = var.project_create
+  services = [
+    "compute.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "cloudscheduler.googleapis.com",
+    "run.googleapis.com",
+    "bigquery.googleapis.com"
+  ]
+  policy_boolean = {
+    "constraints/compute.requireOsLogin" = false
+    "constraints/compute.requireShieldedVm" = false
+  }
+  policy_list = {
+    "constraints/iam.allowedPolicyMemberDomains" = {
+        inherit_from_parent: false
+        status: true
+        suggested_value: null
+        values: [],
+        allow: {
+          all=true
+        }
+    },
+    "constraints/compute.vmExternalIpAccess" = {
+        inherit_from_parent: false
+        status: true
+        suggested_value: null
+        values: [],
+        allow: {
+          all=true
+        }
+    }
+  }
+}
 
 # resource "google_project_service" "enable_artifactregistry" {
 #   project = var.project_id
@@ -37,73 +99,73 @@ variable "region" {
 #   service = "bigquery.googleapis.com"
 # }
 
-# resource "google_app_engine_application" "app" {
-#   project     = var.project_id
-#   location_id = var.data_region
-#   database_type = "CLOUD_FIRESTORE"
-# }
+resource "google_app_engine_application" "app" {
+  project     = var.project_id
+  location_id = var.data_region
+  database_type = "CLOUD_FIRESTORE"
+}
 
-# resource "google_service_account" "service_account" {
-#   project     = var.project_id
-#   account_id   = "trendservice2"
-#   display_name = "Trend Service Account2"
-# }
+resource "google_service_account" "service_account" {
+  project     = var.project_id
+  account_id   = "trendservice"
+  display_name = "Trend Service Account"
+}
 
-# resource "google_project_iam_member" "firestore_owner_binding" {
-#   project = var.project_id
-#   role    = "roles/datastore.owner"
-#   member  = "serviceAccount:${google_service_account.service_account.email}"
-# }
+resource "google_project_iam_member" "firestore_owner_binding" {
+  project = var.project_id
+  role    = "roles/datastore.owner"
+  member  = "serviceAccount:${google_service_account.service_account.email}"
+}
 
-# resource "google_artifact_registry_repository" "trends-registry" {
-#   project = var.project_id
-#   location      = var.region
-#   repository_id = "trends-registry"
-#   description   = "Registry for trends artifacts"
-#   format        = "DOCKER"
-# }
+resource "google_artifact_registry_repository" "trends-registry" {
+  project = var.project_id
+  location      = var.region
+  repository_id = "trends-registry"
+  description   = "Registry for trends artifacts"
+  format        = "DOCKER"
+}
 
-# resource "google_cloud_run_service" "trends_admin_service" {
-#   name     = "trends-admin-service"
-#   project = var.project_id
-#   location = var.region
+resource "google_cloud_run_service" "trends_admin_service" {
+  name     = "trends-admin-service"
+  project = var.project_id
+  location = var.region
 
-#   template {
-#     spec {
-#       containers {
-#         image = "${var.region}-docker.pkg.dev/${var.project_id}/trends-registry/trends-service"
-#       }
-#     }
-#   }
+  template {
+    spec {
+      containers {
+        image = "${var.region}-docker.pkg.dev/${var.project_id}/trends-registry/trends-service"
+      }
+    }
+  }
 
-#   traffic {
-#     percent         = 100
-#     latest_revision = true
-#   }
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
 
-#   depends_on = [google_project_service.enable_cloudrun]
-# }
+  depends_on = [google_project_service.enable_cloudrun]
+}
 
-# resource "google_cloud_scheduler_job" "trends-refresh" {
-#   name             = "trends-refresh"
-#   project          = var.project_id
-#   region = var.region
-#   description      = "Job to refresh the trends data."
-#   schedule         = "0 5 * * *"
-#   time_zone        = "Europe/Amsterdam"
-#   attempt_deadline = "320s"
+resource "google_cloud_scheduler_job" "trends-refresh" {
+  name             = "trends-refresh"
+  project          = var.project_id
+  region = var.region
+  description      = "Job to refresh the trends data."
+  schedule         = "0 5 * * *"
+  time_zone        = "Europe/Amsterdam"
+  attempt_deadline = "320s"
 
-#   retry_config {
-#     retry_count = 1
-#   }
+  retry_config {
+    retry_count = 1
+  }
 
-#   http_target {
-#     http_method = "GET"
-#     uri         = google_cloud_run_service.trends_admin_service.status[0].url
-#   }
+  http_target {
+    http_method = "GET"
+    uri         = google_cloud_run_service.trends_admin_service.status[0].url
+  }
 
-#   depends_on = [google_cloud_run_service.trends_admin_service]
-# }
+  depends_on = [google_cloud_run_service.trends_admin_service]
+}
 
 resource "google_bigquery_dataset" "default" {
   project                     = var.project_id
