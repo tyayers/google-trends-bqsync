@@ -63,7 +63,7 @@ resource "google_artifact_registry_repository" "trends-registry" {
   format        = "DOCKER"
   
   provisioner "local-exec" {
-    command = "gcloud builds submit --config=cloudbuild.yaml --substitutions=_LOCATION='${var.region}',_REPOSITORY='trends-registry',_IMAGE='trends-service' ."
+    command = "cd .. && gcloud builds submit --config=cloudbuild.yaml --substitutions=_LOCATION='${var.region}',_REPOSITORY='trends-registry',_IMAGE='trends-service' ."
   }
 }
 
