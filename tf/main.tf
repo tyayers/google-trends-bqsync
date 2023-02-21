@@ -143,8 +143,8 @@ resource "google_cloud_scheduler_job" "trends-refresh" {
 resource "google_firestore_document" "trends" {
   project     = var.project_id
   collection  = "trends"
-  document_id = "cold&flu
-  fields      = "{\"geos\": [\"WORLD\", \"US\", \"GB\", \"DE\"], \"terms\": [{\"name\": \"rhinovirus\"}]}"
+  document_id = "cold&amp;flu"
+  fields      = "{\"geos\": {\"arrayValue\": {\"values\": [{\"stringValue\": \"WORLD\"}, {\"stringValue\": \"US\"}, {\"stringValue\": \"GB\"}, {\"stringValue\": \"DE\"}]}}, \"terms\": {\"arrayValue\": {\"values\": [{\"mapValue\": {\"fields\": {\"name\": {\"stringValue\": \"rhinovirus\"}}}}]}}}"
   depends_on  = [google_app_engine_application.app]
 }
 
