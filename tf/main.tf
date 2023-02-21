@@ -122,7 +122,7 @@ resource "google_cloud_scheduler_job" "trends-refresh" {
   }
 
   http_target {
-    http_method = "GET"
+    http_method = "POST"
     uri         = "${google_cloud_run_service.trends_admin_service.status[0].url}/trends/cold&flu/refresh"
 
     oidc_token {
