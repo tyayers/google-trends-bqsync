@@ -127,6 +127,7 @@ resource "google_cloud_scheduler_job" "trends-refresh" {
 
     oidc_token {
       service_account_email = google_service_account.service_account.email
+      audience = google_cloud_run_service.trends_admin_service.status[0].url
     }
   }
 
