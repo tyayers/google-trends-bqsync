@@ -140,6 +140,14 @@ resource "google_cloud_scheduler_job" "trends-refresh" {
   depends_on = [google_cloud_run_service.trends_admin_service]
 }
 
+resource "google_firestore_document" "trends" {
+  project     = var.project_id
+  collection  = "trends"
+  document_id = "cold&flu
+  fields      = "{\"geos\": [\"WORLD\", \"US\", \"GB\", \"DE\"], \"terms\": [{\"name\": \"rhinovirus\"}]}"
+  depends_on  = [google_app_engine_application.app]
+}
+
 resource "google_bigquery_dataset" "default" {
   project                     = var.project_id
   dataset_id                  = "trends_dataset"
