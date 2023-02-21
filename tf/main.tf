@@ -123,7 +123,7 @@ resource "google_cloud_scheduler_job" "trends-refresh" {
 
   http_target {
     http_method = "GET"
-    uri         = "${google_cloud_run_service.trends_admin_service.status[0].url}/cold&flu/refresh"
+    uri         = "${google_cloud_run_service.trends_admin_service.status[0].url}/trends/cold&flu/refresh"
 
     oidc_token {
       service_account_email = google_service_account.service_account.email
