@@ -43,6 +43,12 @@ resource "google_project_service" "enable_bigquery" {
   disable_dependent_services = true
 }
 
+resource "google_project_service" "enable_firestore" {
+  project = var.project_id
+  service = "firestore.googleapis.com"
+  disable_dependent_services = true
+}
+
 resource "google_app_engine_application" "app" {
   project     = var.project_id
   location_id = var.data_region
