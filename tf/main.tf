@@ -40,6 +40,7 @@ resource "google_project_service" "enable_cloudrun" {
 resource "google_project_service" "enable_bigquery" {
   project = var.project_id
   service = "bigquery.googleapis.com"
+  disable_dependent_services = true
 }
 
 resource "google_app_engine_application" "app" {
@@ -60,6 +61,12 @@ resource "google_project_iam_member" "firestore_owner_binding" {
   member  = "serviceAccount:${google_service_account.service_account.email}"
 }
 
+resource "google_project_iam_member" "run_invoker_binding" {
+  project = var.project_id
+  role    = "roles/run.invoker"
+  member  = "serviceAccount:${google_service_account.service_account.email}"
+}
+
 resource "google_artifact_registry_repository" "trends-registry" {
   project = var.project_id
   location      = var.region
@@ -70,8 +77,6 @@ resource "google_artifact_registry_repository" "trends-registry" {
   provisioner "local-exec" {
     command = "cd .. && gcloud builds submit --project=${var.project_id} --config=cloudbuild.yaml --substitutions=_LOCATION='${var.region}',_REPOSITORY='trends-registry',_IMAGE='trends-service' ."
   }
-
-  depends_on = [google_project_service.enable_cloudrun]
 }
 
 resource "google_cloud_run_service" "trends_admin_service" {
@@ -92,7 +97,14 @@ resource "google_cloud_run_service" "trends_admin_service" {
     latest_revision = true
   }
 
-  depends_on = [google_project_service.enable_artifactregistry]
+  depends_on = [google_artifact_registry_repository.trends-registry]
+}
+
+resource "google_cloud_run_service_iam_member" "run_all_users" {
+  service  = google_cloud_run_service.trends_admin_service.name
+  location = google_cloud_run_service.trends_admin_service.location
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.service_account.email}"
 }
 
 resource "google_cloud_scheduler_job" "trends-refresh" {
@@ -111,6 +123,10 @@ resource "google_cloud_scheduler_job" "trends-refresh" {
   http_target {
     http_method = "GET"
     uri         = google_cloud_run_service.trends_admin_service.status[0].url
+
+    oidc_token {
+      service_account_email = google_service_account.service_account.email
+    }
   }
 
   depends_on = [google_cloud_run_service.trends_admin_service]
@@ -132,6 +148,7 @@ resource "google_bigquery_table" "default" {
   project    = var.project_id
   dataset_id = google_bigquery_dataset.default.dataset_id
   table_id   = "trends"
+  deletion_protection=false
 
   time_partitioning {
     type = "DAY"
@@ -169,7 +186,6 @@ resource "google_bigquery_table" "default" {
   }
 ]
 EOF
-
 }
 
 # Outputs
