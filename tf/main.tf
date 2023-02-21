@@ -111,7 +111,8 @@ resource "google_cloud_run_service_iam_member" "run_all_users" {
   service  = google_cloud_run_service.trends_admin_service.name
   location = google_cloud_run_service.trends_admin_service.location
   role     = "roles/run.invoker"
-  member   = "serviceAccount:${google_service_account.service_account.email}"
+  #member   = "serviceAccount:${google_service_account.service_account.email}"
+  member   = "allUsers"
 }
 
 resource "google_cloud_scheduler_job" "trends-refresh" {
