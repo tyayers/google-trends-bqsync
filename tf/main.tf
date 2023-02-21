@@ -129,7 +129,7 @@ resource "google_cloud_scheduler_job" "trends-refresh" {
 
   http_target {
     http_method = "POST"
-    uri         = "${google_cloud_run_service.trends_admin_service.status[0].url}/trends/cold&flu/refresh"
+    uri         = "${google_cloud_run_service.trends_admin_service.status[0].url}/trends/flu/refresh"
 
     oidc_token {
       service_account_email = google_service_account.service_account.email
@@ -143,7 +143,7 @@ resource "google_cloud_scheduler_job" "trends-refresh" {
 resource "google_firestore_document" "trends" {
   project     = var.project_id
   collection  = "trends"
-  document_id = "cold&amp;flu"
+  document_id = "flu"
   fields      = "{\"geos\": {\"arrayValue\": {\"values\": [{\"stringValue\": \"WORLD\"}, {\"stringValue\": \"US\"}, {\"stringValue\": \"GB\"}, {\"stringValue\": \"DE\"}]}}, \"terms\": {\"arrayValue\": {\"values\": [{\"mapValue\": {\"fields\": {\"name\": {\"stringValue\": \"rhinovirus\"}}}}]}}}"
   depends_on  = [google_app_engine_application.app]
 }
