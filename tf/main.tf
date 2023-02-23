@@ -73,7 +73,7 @@ resource "google_project_iam_member" "run_invoker_binding" {
   member  = "serviceAccount:${google_service_account.service_account.email}"
 }
 
-resource "google_project_iam_member" "run_invoker_binding" {
+resource "google_project_iam_member" "bigquery_editor_binding" {
   project = var.project_id
   role    = "roles/bigquery.dataEditor"
   member  = "serviceAccount:${google_service_account.service_account.email}"
