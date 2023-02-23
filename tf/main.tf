@@ -73,6 +73,12 @@ resource "google_project_iam_member" "run_invoker_binding" {
   member  = "serviceAccount:${google_service_account.service_account.email}"
 }
 
+resource "google_project_iam_member" "run_invoker_binding" {
+  project = var.project_id
+  role    = "roles/bigquery.dataEditor"
+  member  = "serviceAccount:${google_service_account.service_account.email}"
+}
+
 resource "google_artifact_registry_repository" "trends-registry" {
   project = var.project_id
   location      = var.region
@@ -111,8 +117,8 @@ resource "google_cloud_run_service_iam_member" "run_all_users" {
   service  = google_cloud_run_service.trends_admin_service.name
   location = google_cloud_run_service.trends_admin_service.location
   role     = "roles/run.invoker"
-  #member   = "serviceAccount:${google_service_account.service_account.email}"
   member   = "allUsers"
+  #member   = "serviceAccount:${google_service_account.service_account.email}"
 }
 
 resource "google_cloud_scheduler_job" "trends-refresh" {
@@ -130,7 +136,7 @@ resource "google_cloud_scheduler_job" "trends-refresh" {
 
   http_target {
     http_method = "POST"
-    uri         = "${google_cloud_run_service.trends_admin_service.status[0].url}/trends/flu/refresh"
+    uri         = "${google_cloud_run_service.trends_admin_service.status[0].url}/trends/cold/refresh"
 
     oidc_token {
       service_account_email = google_service_account.service_account.email
@@ -144,7 +150,7 @@ resource "google_cloud_scheduler_job" "trends-refresh" {
 resource "google_firestore_document" "trends" {
   project     = var.project_id
   collection  = "trends"
-  document_id = "flu"
+  document_id = "cold"
   fields      = "{\"geos\": {\"arrayValue\": {\"values\": [{\"stringValue\": \"WORLD\"}, {\"stringValue\": \"US\"}, {\"stringValue\": \"GB\"}, {\"stringValue\": \"DE\"}]}}, \"terms\": {\"arrayValue\": {\"values\": [{\"mapValue\": {\"fields\": {\"name\": {\"stringValue\": \"rhinovirus\"}}}}]}}}"
   depends_on  = [google_app_engine_application.app]
 }
