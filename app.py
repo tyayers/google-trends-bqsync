@@ -23,31 +23,39 @@ urls = (
 app = web.application(urls, globals())
 
 if not firebase_admin._apps:
-  cred = credentials.ApplicationDefault()
-  firebase_admin.initialize_app(cred, {
-    'projectId': cred.project_id,
-  })
+    cred = credentials.ApplicationDefault()
+    firebase_admin.initialize_app(cred, {
+        'projectId': cred.project_id,
+    })
+
 
 class refresh_manager:
     db = firestore.client()
     bq = client = bigquery.Client()
-    
+
     def POST(self, topic):
         # Start refresh...
         doc_ref = self.db.collection('trends').document(topic)
         doc = doc_ref.get().to_dict()
-        
+
         print("starting refresh")
 
         get_trends_latest(doc["terms"], doc["geos"], topic)
-        
+
         print("finished refresh")
         self.db.collection('trends').document(topic).set(doc)
-        
+
+        print("finished initial, writing output file")
+        f = open("trends_output.json", "w")
+        f.write(json.dumps(doc["terms"]))
+        f.close()
+
+        self.insertToBigQuery(doc["terms"])
+
         web.header('Access-Control-Allow-Origin', '*')
         web.header('Content-Type', 'application/json')
         return json.dumps(doc)
-    
+
     def insertToBigQuery(self, terms):
         rows_to_insert = []
 
@@ -55,16 +63,18 @@ class refresh_manager:
             for rec in term["data"]:
                 rows_to_insert.append(rec)
 
-        errors = self.bq.insert_rows_json(os.environ.get('TRENDS_TABLE'), rows_to_insert)
+        tableName = os.environ.get('GCLOUD_PROJECT') + ".trends_dataset.trends"
+        errors = self.bq.insert_rows_json(tableName, rows_to_insert)
         if errors == []:
             print("New rows have been added.")
         else:
             print("Encountered errors while inserting rows: {}".format(errors))
-        
+
+
 class initial_manager:
     db = firestore.client()
     bq = client = bigquery.Client()
-    
+
     def POST(self, topic):
         data = None
         if web.data():
@@ -83,16 +93,16 @@ class initial_manager:
             doc = doc_ref.get().to_dict()
             terms = doc["terms"]
             geos = doc["geos"]
-        
+
         print("starting initial")
 
-        get_trends_all(terms, geos)
-        
+        get_trends_all(topic, terms, geos)
+
         print("finished initial, writing output file")
         f = open("trends_output.json", "w")
         f.write(json.dumps(terms))
-        f.close()        
-        
+        f.close()
+
         self.insertToBigQuery(terms)
 
         web.header('Access-Control-Allow-Origin', '*')
@@ -100,9 +110,9 @@ class initial_manager:
         return json.dumps({
             "result": "Ok"
         })
-    
+
     def insertToBigQuery(self, terms):
-        
+
         for term in terms:
             rows_to_insert = []
 
@@ -110,13 +120,17 @@ class initial_manager:
                 rows_to_insert.append(rec)
 
             if len(rows_to_insert) > 0:
-                errors = self.bq.insert_rows_json(os.environ.get('TRENDS_TABLE'), rows_to_insert)
+                tableName = os.environ.get(
+                    'GCLOUD_PROJECT') + ".trends_dataset.trends"
+                errors = self.bq.insert_rows_json(tableName, rows_to_insert)
                 if errors == []:
-                    print("Added rows to " + os.environ.get('TRENDS_TABLE') + " for term " + term["name"])
+                    print("Added rows to " + tableName +
+                          " for term " + term["name"])
                 else:
                     print("Encountered errors while inserting rows: {}".format(errors))
             else:
                 print("No rows to add for term " + term["name"])
+
 
 class terms_manager:
     db = firestore.client()
@@ -127,12 +141,12 @@ class terms_manager:
 
         doc_ref = self.db.collection('trends').document(topic)
         doc = doc_ref.get().to_dict()
-        
+
         print(doc)
 
         if "geos" not in doc:
             doc["geos"] = []
-            
+
         if "terms" not in doc:
             doc["terms"] = []
 
@@ -146,80 +160,90 @@ class terms_manager:
     def POST(self, topic):
 
         data = json.loads(web.data())
-        
+
         doc_ref = self.db.collection('trends').document(topic)
         doc = doc_ref.get().to_dict()
-        
+
         doc["terms"] = data["terms"]
         self.db.collection('trends').document(topic).set(doc)
-        
+
         web.header('Access-Control-Allow-Origin', '*')
         web.header('Content-Type', 'application/json')
         return json.dumps({"result": "OK"})
-        
-def get_trends_latest(terms, geos, topic_singular):
+
+
+def get_trends_latest(topic, terms, geos):
     result = ""
-    pytrends = TrendReq(hl='en-US', tz=60, retries=8, timeout=(10,25), backoff_factor=0.8)
+    pytrends = TrendReq(hl='en-US', tz=60, retries=8,
+                        timeout=(10, 25), backoff_factor=0.8)
 
     for term in terms:
         kw_list = [term["name"]]
         term["data"] = []
-        
+
         for geo in geos:
             new_geo = ""
             if geo != "WORLD":
                 new_geo = geo
 
-            pytrends.build_payload(kw_list, cat=0, timeframe='now 7-d', geo=new_geo, gprop='')
+            pytrends.build_payload(
+                kw_list, cat=0, timeframe='now 7-d', geo=new_geo, gprop='')
             df = pytrends.interest_over_time()
 
             row = {}
             for row in df.itertuples():
                 row = {
-                    "geo": geo,                    
+                    "geo": geo,
+                    "topic": topic,
                     "name": term["name"],
-                    "date": str(row.Index.date()),                    
+                    "date": str(row.Index.date()),
                     "score": row[1]
                 }
-        
+
             print(row)
-                        
+
             if row != {}:
                 term["data"].append(row)
 
     return result
 
-def get_trends_all(terms, geos):
+
+def get_trends_all(topic, terms, geos):
     result = ""
-    pytrends = TrendReq(hl='en-US', tz=60, retries=8, timeout=(10,25), backoff_factor=0.8)
+    pytrends = TrendReq(hl='en-US', tz=60, retries=8,
+                        timeout=(10, 25), backoff_factor=0.8)
 
     for term in terms:
         kw_list = [term["name"]]
         term["data"] = []
-        
+
         for geo in geos:
             new_geo = ""
             if geo != "WORLD":
                 new_geo = geo
 
-            pytrends.build_payload(kw_list, cat=0, timeframe='today 5-y', geo=new_geo, gprop='')
+            pytrends.build_payload(
+                kw_list, cat=0, timeframe='today 5-y', geo=new_geo, gprop='')
             df = pytrends.interest_over_time()
 
             row = {}
             for row in df.itertuples():
 
-                print("adding row " + geo + " " + term["name"] + " " + str(row.Index.date()))
+                print("adding row " + geo + " " +
+                      term["name"] + " " + str(row.Index.date()))
 
                 row = {
-                    "geo": geo,                    
+                    "geo": geo,
+                    "topic": topic,
                     "name": term["name"],
-                    "date": str(row.Index.date()),                    
+                    "date": str(row.Index.date()),
                     "score": row[1]
                 }
 
                 term["data"].append(row)
 
     return result
+
 
 if __name__ == "__main__":
     app.run()

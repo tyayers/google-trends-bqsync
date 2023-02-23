@@ -190,6 +190,12 @@ resource "google_bigquery_table" "default" {
     "description": "The trends search term."
   },
   {
+    "name": "topic",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "The topic of the search trend value."
+  },  
+  {
     "name": "name",
     "type": "STRING",
     "mode": "REQUIRED",
