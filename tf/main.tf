@@ -39,7 +39,7 @@ variable "region" {
 
 # Resources
 
-resource "google_project" "default" {
+module "project" {
   source          = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/project?ref=v15.0.0"
   name            = var.project_id
   parent          = var.project_parent
@@ -82,28 +82,28 @@ resource "google_project_service" "enable_artifactregistry" {
   project = var.project_id
   service = "artifactregistry.googleapis.com"
 
-  depends_on = [google_project.default]
+  depends_on = [module.project]
 }
 
 resource "google_project_service" "enable_cloudbuild" {
   project = var.project_id
   service = "cloudbuild.googleapis.com"
 
-  depends_on = [google_project.default]  
+  depends_on = [module.project] 
 }
 
 resource "google_project_service" "enable_scheduler" {
   project = var.project_id
   service = "cloudscheduler.googleapis.com"
 
-  depends_on = [google_project.default]
+  depends_on = [module.project]
 }
 
 resource "google_project_service" "enable_cloudrun" {
   project = var.project_id
   service = "run.googleapis.com"
 
-  depends_on = [google_project.default]
+  depends_on = [module.project]
 }
 
 resource "google_project_service" "enable_bigquery" {
@@ -111,7 +111,7 @@ resource "google_project_service" "enable_bigquery" {
   service = "bigquery.googleapis.com"
   disable_dependent_services = true
 
-  depends_on = [google_project.default]
+  depends_on = [module.project]
 }
 
 resource "google_project_service" "enable_firestore" {
@@ -119,7 +119,7 @@ resource "google_project_service" "enable_firestore" {
   service = "firestore.googleapis.com"
   disable_dependent_services = true
 
-  depends_on = [google_project.default]
+  depends_on = [module.project]
 }
 
 resource "google_app_engine_application" "app" {
@@ -135,7 +135,7 @@ resource "google_service_account" "service_account" {
   account_id   = "trendservice"
   display_name = "Trend Service Account"
 
-  depends_on = [google_project.default]
+  depends_on = [module.project]
 }
 
 resource "google_project_iam_member" "firestore_owner_binding" {
@@ -143,7 +143,7 @@ resource "google_project_iam_member" "firestore_owner_binding" {
   role    = "roles/datastore.owner"
   member  = "serviceAccount:${google_service_account.service_account.email}"
 
-  depends_on = [google_project.default]
+  depends_on = [module.project]
 }
 
 resource "google_project_iam_member" "run_invoker_binding" {
@@ -151,7 +151,7 @@ resource "google_project_iam_member" "run_invoker_binding" {
   role    = "roles/run.invoker"
   member  = "serviceAccount:${google_service_account.service_account.email}"
 
-  depends_on = [google_project.default]
+  depends_on = [module.project]
 }
 
 resource "google_project_iam_member" "bigquery_editor_binding" {
@@ -159,7 +159,7 @@ resource "google_project_iam_member" "bigquery_editor_binding" {
   role    = "roles/bigquery.dataEditor"
   member  = "serviceAccount:${google_service_account.service_account.email}"
 
-  depends_on = [google_project.default]
+  depends_on = [module.project]
 }
 
 resource "google_artifact_registry_repository" "trends-registry" {
