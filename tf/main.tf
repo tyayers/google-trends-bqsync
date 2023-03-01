@@ -160,6 +160,10 @@ resource "google_cloud_scheduler_job" "trends-refresh" {
     }
   }
 
+  provisioner "local-exec" {
+    command = "curl -X POST ${google_cloud_run_service.trends_admin_service.status[0].url}/trends/cold/initial"
+  }
+
   depends_on = [google_cloud_run_service.trends_admin_service]
 }
 
