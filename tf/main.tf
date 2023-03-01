@@ -39,7 +39,7 @@ variable "region" {
 
 # Resources
 
-module "project" {
+resource "google_project" "default" {
   source          = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/project?ref=v15.0.0"
   name            = var.project_id
   parent          = var.project_parent
@@ -81,63 +81,85 @@ module "project" {
 resource "google_project_service" "enable_artifactregistry" {
   project = var.project_id
   service = "artifactregistry.googleapis.com"
+
+  depends_on = [google_project.default]
 }
 
 resource "google_project_service" "enable_cloudbuild" {
   project = var.project_id
   service = "cloudbuild.googleapis.com"
+
+  depends_on = [google_project.default]  
 }
 
 resource "google_project_service" "enable_scheduler" {
   project = var.project_id
   service = "cloudscheduler.googleapis.com"
+
+  depends_on = [google_project.default]
 }
 
 resource "google_project_service" "enable_cloudrun" {
   project = var.project_id
   service = "run.googleapis.com"
+
+  depends_on = [google_project.default]
 }
 
 resource "google_project_service" "enable_bigquery" {
   project = var.project_id
   service = "bigquery.googleapis.com"
   disable_dependent_services = true
+
+  depends_on = [google_project.default]
 }
 
 resource "google_project_service" "enable_firestore" {
   project = var.project_id
   service = "firestore.googleapis.com"
   disable_dependent_services = true
+
+  depends_on = [google_project.default]
 }
 
 resource "google_app_engine_application" "app" {
   project     = var.project_id
   location_id = var.data_region
   database_type = "CLOUD_FIRESTORE"
+
+  depends_on = [google_project_service.enable_firestore]
 }
 
 resource "google_service_account" "service_account" {
   project     = var.project_id
   account_id   = "trendservice"
   display_name = "Trend Service Account"
+
+  depends_on = [google_project.default]
 }
 
 resource "google_project_iam_member" "firestore_owner_binding" {
   project = var.project_id
   role    = "roles/datastore.owner"
   member  = "serviceAccount:${google_service_account.service_account.email}"
+
+  depends_on = [google_project.default]
 }
 
 resource "google_project_iam_member" "run_invoker_binding" {
   project = var.project_id
   role    = "roles/run.invoker"
   member  = "serviceAccount:${google_service_account.service_account.email}"
+
+  depends_on = [google_project.default]
 }
 
 resource "google_project_iam_member" "bigquery_editor_binding" {
   project = var.project_id
   role    = "roles/bigquery.dataEditor"
   member  = "serviceAccount:${google_service_account.service_account.email}"
+
+  depends_on = [google_project.default]
 }
 
 resource "google_artifact_registry_repository" "trends-registry" {
@@ -150,6 +172,8 @@ resource "google_artifact_registry_repository" "trends-registry" {
   provisioner "local-exec" {
     command = "cd .. && gcloud builds submit --project=${var.project_id} --config=cloudbuild.yaml --substitutions=_LOCATION='${var.region}',_REPOSITORY='trends-registry',_IMAGE='trends-service' ."
   }
+
+  depends_on = [google_project_service.enable_artifactregistry]
 }
 
 resource "google_cloud_run_service" "trends_admin_service" {
@@ -233,6 +257,7 @@ resource "google_firestore_document" "trends" {
   collection  = "trends"
   document_id = "cold"
   fields      = "{\"geos\": {\"arrayValue\": {\"values\": [{\"stringValue\": \"WORLD\"}, {\"stringValue\": \"US\"}, {\"stringValue\": \"GB\"}, {\"stringValue\": \"DE\"}]}}, \"terms\": {\"arrayValue\": {\"values\": [{\"mapValue\": {\"fields\": {\"name\": {\"stringValue\": \"rhinovirus\"}}}}]}}}"
+  
   depends_on  = [google_app_engine_application.app]
 }
 
@@ -246,6 +271,8 @@ resource "google_bigquery_dataset" "default" {
   labels = {
     env = "default"
   }
+
+  depends_on = [google_project_service.enable_bigquery]
 }
 
 resource "google_bigquery_table" "default" {
@@ -296,6 +323,8 @@ resource "google_bigquery_table" "default" {
   }
 ]
 EOF
+
+  depends_on = [google_bigquery_dataset.default]
 }
 
 # Outputs
