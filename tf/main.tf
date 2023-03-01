@@ -113,12 +113,28 @@ resource "google_cloud_run_service" "trends_admin_service" {
   depends_on = [google_artifact_registry_repository.trends-registry]
 }
 
-resource "google_cloud_run_service_iam_member" "run_all_users" {
-  service  = google_cloud_run_service.trends_admin_service.name
-  location = google_cloud_run_service.trends_admin_service.location
-  role     = "roles/run.invoker"
-  member   = "allUsers"
-  #member   = "serviceAccount:${google_service_account.service_account.email}"
+# resource "google_cloud_run_service_iam_member" "run_all_users" {
+#   service  = google_cloud_run_service.trends_admin_service.name
+#   location = google_cloud_run_service.trends_admin_service.location
+#   role     = "roles/run.invoker"
+#   member   = "serviceAccount:${google_service_account.service_account.email}"
+# }
+
+data "google_iam_policy" "noauth" {
+  binding {
+    role = "roles/run.invoker"
+    members = [
+      "allUsers",
+    ]
+  }
+}
+
+resource "google_cloud_run_service_iam_policy" "noauth" {
+  location    = google_cloud_run_service.trends_admin_service.location
+  project     = google_cloud_run_service.trends_admin_service.project
+  service     = google_cloud_run_service.trends_admin_service.name
+
+  policy_data = data.google_iam_policy.noauth.policy_data
 }
 
 resource "google_cloud_scheduler_job" "trends-refresh" {
