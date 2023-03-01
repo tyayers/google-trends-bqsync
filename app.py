@@ -3,6 +3,7 @@ import web
 import requests
 import json
 import time
+import logging
 from datetime import datetime, timedelta
 from google.cloud import storage, bigquery
 from pytrends.request import TrendReq
@@ -35,12 +36,20 @@ class refresh_manager:
 
     def POST(self, topic):
         # Start refresh...
-        doc_ref = self.db.collection('trends').document(topic)
-        doc = doc_ref.get().to_dict()
+        doc = None
+        if web.data():
+            doc = json.loads(web.data())
 
-        print("starting refresh")
+        if doc:
+            logging.info("found data in post body")
+        else:
+            doc_ref = self.db.collection('trends').document(topic)
+            doc = doc_ref.get().to_dict()
 
-        get_trends_latest(doc["terms"], doc["geos"], topic)
+        logging.warning('Starting refresh!')
+        logging.warning(doc)
+
+        get_trends_latest(topic, doc["terms"], doc["geos"])
 
         print("finished refresh")
         self.db.collection('trends').document(topic).set(doc)
@@ -94,7 +103,7 @@ class initial_manager:
             terms = doc["terms"]
             geos = doc["geos"]
 
-        print("starting initial")
+        logging.warning('Starting initial data load!')
 
         get_trends_all(topic, terms, geos)
 
