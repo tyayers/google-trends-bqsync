@@ -185,7 +185,11 @@ resource "google_cloud_run_service" "trends_admin_service" {
     spec {
       containers {
         image = "${var.region}-docker.pkg.dev/${var.project_id}/trends-registry/trends-service"
-      }
+        env {
+          name = "GCLOUD_PROJECT"
+          value = var.project_id
+        }      
+      }   
       service_account_name = google_service_account.service_account.email
     }
   }
