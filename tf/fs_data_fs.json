@@ -1,0 +1,872 @@
+{
+  "geos": {
+    "arrayValue": {
+      "values": [
+        {
+          "stringValue": "WORLD"
+        },
+        {
+          "stringValue": "US"
+        },
+        {
+          "stringValue": "GB"
+        },
+        {
+          "stringValue": "DE"
+        }
+      ]
+    }
+  },
+  "terms": {
+    "arrayValue": {
+      "values": [
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "rhinovirus"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "sore throat"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "rikodeine"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "flu symptoms"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "discrepancy"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "fever"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "codral cold and flu"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "cough medicine"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "cold and flu tablets"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "stomach flu"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "nasal spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "discrepancy records"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "flu"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "cough syrup"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "nasonex nasal spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "pholcodine"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "dymista"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "dry cough"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "bisolvon"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "nyquil"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "cold symptoms"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "lemsip"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "robitussin"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "dymista nasal spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "influenza a"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "common cold"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "dextromethorphan"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "cough"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "demazin"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "chesty cough"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "vicks vaporub"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "dymista 125 50"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "codral"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "fess nasal spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "difflam throat spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "bisolvon chesty forte"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "avamys nasal spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "duro tuss"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "how to get rid of a sore throat"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "bromhexine"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "difflam"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "lidocaine spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "influenza a symptoms"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "euky bear"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "coughing up green phlegm"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "vicks"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "dimetapp"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "mucus"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "throat"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "head cold"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "bromhexine hydrochloride"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "sore throat medicine"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "sore throat covid"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "yellow snot"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "phlegm cough"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "lozenges"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "otrivin nasal spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "rhinocort"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "cough suppressant"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "nyquil chicken"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "vicks inhaler"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "colds"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "nasonex spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "rikodeine cough syrup"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "sudafed nasal spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "runny nose"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "blood in phlegm"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "dry throat"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "sore throat no other symptoms"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "duro tuss dry cough"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "yellow phlegm"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "ryaltris nasal spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "green snot"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "how to stop coughing at night"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "robitussin dry cough forte"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "dry cough medicine"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "dimetapp cold and flu"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "saline nasal spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "demazin cold and flu"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "how to get rid of sore throat"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "coughing"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "post nasal drip cough"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "rhinocort nasal spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "butter menthol"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "tamiflu"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "avamys"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "cold and flu"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "mometasone nasal spray"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "difference between cold and flu"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "prospan"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "how long does the flu last"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "covid sore throat"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "flu vaccine"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "i have a cough that won t go away but i m not sick"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

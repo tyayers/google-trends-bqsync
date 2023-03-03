@@ -261,7 +261,7 @@ resource "google_firestore_document" "trends" {
   collection  = "trends"
   document_id = "cold"
   #fields      = "{\"geos\": {\"arrayValue\": {\"values\": [{\"stringValue\": \"WORLD\"}, {\"stringValue\": \"US\"}, {\"stringValue\": \"GB\"}, {\"stringValue\": \"DE\"}]}}, \"terms\": {\"arrayValue\": {\"values\": [{\"mapValue\": {\"fields\": {\"name\": {\"stringValue\": \"rhinovirus\"}}}}]}}}"
-  fields      = jsonencode(jsondecode(file("${path.module}/fs_data2.json")))
+  fields      = jsonencode(jsondecode(file("${path.module}/fs_data_fs.json")))
   depends_on  = [google_app_engine_application.app]
 }
 
