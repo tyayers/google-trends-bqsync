@@ -1,0 +1,303 @@
+{
+  "geos": [
+    "WORLD",
+    "US",
+    "US-CA",
+    "US-AL",
+    "GB",
+    "GB-ENG",
+    "DE",
+    "DE-BW",
+    "DE-BE"
+  ],
+  "terms": [
+    {
+      "name": "rhinovirus"
+    },
+    {
+      "name": "sore throat"
+    },
+    {
+      "name": "rikodeine"
+    },
+    {
+      "name": "flu symptoms"
+    },
+    {
+      "name": "discrepancy"
+    },
+    {
+      "name": "fever"
+    },
+    {
+      "name": "codral cold and flu"
+    },
+    {
+      "name": "cough medicine"
+    },
+    {
+      "name": "cold and flu tablets"
+    },
+    {
+      "name": "stomach flu"
+    },
+    {
+      "name": "nasal spray"
+    },
+    {
+      "name": "discrepancy records"
+    },
+    {
+      "name": "flu"
+    },
+    {
+      "name": "cough syrup"
+    },
+    {
+      "name": "nasonex nasal spray"
+    },
+    {
+      "name": "pholcodine"
+    },
+    {
+      "name": "dymista"
+    },
+    {
+      "name": "influenza"
+    },
+    {
+      "name": "dry cough"
+    },
+    {
+      "name": "bisolvon"
+    },
+    {
+      "name": "nyquil"
+    },
+    {
+      "name": "cold symptoms"
+    },
+    {
+      "name": "lemsip"
+    },
+    {
+      "name": "robitussin"
+    },
+    {
+      "name": "dymista nasal spray"
+    },
+    {
+      "name": "influenza a"
+    },
+    {
+      "name": "common cold"
+    },
+    {
+      "name": "dextromethorphan"
+    },
+    {
+      "name": "cough"
+    },
+    {
+      "name": "demazin"
+    },
+    {
+      "name": "chesty cough"
+    },
+    {
+      "name": "vicks vaporub"
+    },
+    {
+      "name": "dymista 125 50"
+    },
+    {
+      "name": "codral"
+    },
+    {
+      "name": "fess nasal spray"
+    },
+    {
+      "name": "difflam throat spray"
+    },
+    {
+      "name": "bisolvon chesty forte"
+    },
+    {
+      "name": "avamys nasal spray"
+    },
+    {
+      "name": "duro tuss"
+    },
+    {
+      "name": "how to get rid of a sore throat"
+    },
+    {
+      "name": "bromhexine"
+    },
+    {
+      "name": "difflam"
+    },
+    {
+      "name": "lidocaine spray"
+    },
+    {
+      "name": "influenza a symptoms"
+    },
+    {
+      "name": "euky bear"
+    },
+    {
+      "name": "coughing up green phlegm"
+    },
+    {
+      "name": "vicks"
+    },
+    {
+      "name": "dimetapp"
+    },
+    {
+      "name": "mucus"
+    },
+    {
+      "name": "throat"
+    },
+    {
+      "name": "head cold"
+    },
+    {
+      "name": "bromhexine hydrochloride"
+    },
+    {
+      "name": "sore throat medicine"
+    },
+    {
+      "name": "sore throat covid"
+    },
+    {
+      "name": "yellow snot"
+    },
+    {
+      "name": "phlegm cough"
+    },
+    {
+      "name": "lozenges"
+    },
+    {
+      "name": "otrivin nasal spray"
+    },
+    {
+      "name": "rhinocort"
+    },
+    {
+      "name": "cough suppressant"
+    },
+    {
+      "name": "nyquil chicken"
+    },
+    {
+      "name": "vicks inhaler"
+    },
+    {
+      "name": "colds"
+    },
+    {
+      "name": "nasonex spray"
+    },
+    {
+      "name": "rikodeine cough syrup"
+    },
+    {
+      "name": "sudafed nasal spray"
+    },
+    {
+      "name": "runny nose"
+    },
+    {
+      "name": "blood in phlegm"
+    },
+    {
+      "name": "dry throat"
+    },
+    {
+      "name": "sore throat no other symptoms"
+    },
+    {
+      "name": "duro tuss dry cough"
+    },
+    {
+      "name": "yellow phlegm"
+    },
+    {
+      "name": "ryaltris nasal spray"
+    },
+    {
+      "name": "green snot"
+    },
+    {
+      "name": "how to stop coughing at night"
+    },
+    {
+      "name": "robitussin dry cough forte"
+    },
+    {
+      "name": "dry cough medicine"
+    },
+    {
+      "name": "dimetapp cold and flu"
+    },
+    {
+      "name": "saline nasal spray"
+    },
+    {
+      "name": "demazin cold and flu"
+    },
+    {
+      "name": "how to get rid of sore throat"
+    },
+    {
+      "name": "coughing"
+    },
+    {
+      "name": "post nasal drip cough"
+    },
+    {
+      "name": "rhinocort nasal spray"
+    },
+    {
+      "name": "butter menthol"
+    },
+    {
+      "name": "tamiflu"
+    },
+    {
+      "name": "tamiflu"
+    },
+    {
+      "name": "avamys"
+    },
+    {
+      "name": "cold and flu"
+    },
+    {
+      "name": "mometasone nasal spray"
+    },
+    {
+      "name": "difference between cold and flu"
+    },
+    {
+      "name": "prospan"
+    },
+    {
+      "name": "how long does the flu last"
+    },
+    {
+      "name": "covid sore throat"
+    },
+    {
+      "name": "flu vaccine"
+    },
+    {
+      "name": "i have a cough that won t go away but i m not sick"
+    }
+  ]
+}
