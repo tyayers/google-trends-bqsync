@@ -1,0 +1,44 @@
+{
+  "geos": {
+    "arrayValue": {
+      "values": [
+        {
+          "stringValue": "WORLD"
+        },
+        {
+          "stringValue": "US"
+        },
+        {
+          "stringValue": "GB"
+        },
+        {
+          "stringValue": "DE"
+        }
+      ]
+    }
+  },
+  "terms": {
+    "arrayValue": {
+      "values": [
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "rhinovirus"
+              }
+            }
+          }
+        },
+        {
+          "mapValue": {
+            "fields": {
+              "name": {
+                "stringValue": "sore throat"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
